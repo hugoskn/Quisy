@@ -52,7 +52,7 @@ export class FetchData extends Component {
     }
 
     async populateWeatherData() {
-        const response = await fetch('api/products/Amazon?tv 50 inch');
+        const response = await fetch('api/products/Amazon?query=tv 50 inch');
         const data = await response.json();
         this.setState({ forecasts: data, loading: false });
     }

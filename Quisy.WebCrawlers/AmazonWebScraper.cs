@@ -1,60 +1,63 @@
 ﻿using HtmlAgilityPack;
 using Quisy.WebScrapers.Helpers;
 using Quisy.WebScrapers.Models;
-using System;
 using System.Collections.Generic;
 using System.Globalization;
 using System.IO;
 
-namespace Quisy.WebScrapers.Amazon
+namespace Quisy.WebScrapers
 {
     public static class AmazonWebScraper
     {
         private static string _BaseUrl = "https://www.amazon.com/s?k=";
         private static string _Delimitator = "+";
-        private const int _IndexesCount = 20;
+        private const int _IndexesCount = 3;
 
         public static IEnumerable<ProductDTO> GetProductsByQuery(string query)
         {
-            var doc = LoadHtmlFromLocalPath();
+            var doc = GetHtmlFromAmazon(query);
 
             if (doc == null)            
-                return null;
-
-            if (doc.DocumentNode.OuterHtml.Contains("mexico", StringComparison.InvariantCultureIgnoreCase))
                 return null;
 
             var products = new List<ProductDTO>();
             for (int i = 0; i <= _IndexesCount; i++)
             {
-                var product = new ProductDTO();
-
-                var node = HtmlNodeHelper.GetFirstByNameAndAttribute(doc.DocumentNode.Descendants(), "div", "data-index", i.ToString());
-                
-                if (node == null || !node.InnerHtml.Contains("price") && !node.OuterHtml.Contains("price"))
-                    continue;
-
-                var descendants = node.Descendants();
-
-                var span = HtmlNodeHelper.GetFirstByNameAndClass(descendants, "span", "a-size-medium a-color-base a-text-normal");
-
-                if (string.IsNullOrWhiteSpace(span?.InnerText) || span.InnerHtml.Length <= 1)                
-                    span = HtmlNodeHelper.GetFirstByNameAndClass(descendants, "span", "a-size-base-plus a-color-base a-text-normal");
-                if (string.IsNullOrWhiteSpace(span?.InnerText))
-                    continue;
-
-                product.Title = span.InnerText;
-
-                product.Price = HtmlNodeHelper.GetFirstByNameAndClass(descendants, "span", "a-price-whole")?.InnerText;
-                if (product.Price == null)
-                    continue;
-
-                product.Image = HtmlNodeHelper.GetFirstValueByNameAndAttribute(descendants, "img", "src");
-
-                products.Add(product);
+                var product = ExtractProductFromHtml(doc, i);
+                if(product != null)
+                    products.Add(product);
             }
                         
             return FormatProducts(products);
+        }
+
+        private static ProductDTO ExtractProductFromHtml(HtmlDocument doc, int index)
+        {
+            var product = new ProductDTO { Source = "Amazon" };
+
+            var node = HtmlNodeHelper.GetFirstByNameAndAttribute(doc.DocumentNode.Descendants(), "div", "data-index", index.ToString());
+
+            if (node == null || !node.InnerHtml.Contains("price") && !node.OuterHtml.Contains("price"))
+                return null;
+
+            var descendants = node.Descendants();
+
+            var span = HtmlNodeHelper.GetFirstByNameAndClass(descendants, "span", "a-size-medium a-color-base a-text-normal");
+
+            if (string.IsNullOrWhiteSpace(span?.InnerText) || span.InnerHtml.Length <= 1)
+                span = HtmlNodeHelper.GetFirstByNameAndClass(descendants, "span", "a-size-base-plus a-color-base a-text-normal");
+            if (string.IsNullOrWhiteSpace(span?.InnerText))
+                return null;
+
+            product.Title = span.InnerText;
+
+            product.Price = HtmlNodeHelper.GetFirstByNameAndClass(descendants, "span", "a-price-whole")?.InnerText;
+            if (product.Price == null)
+                return null;
+
+            product.Image = HtmlNodeHelper.GetFirstValueByNameAndAttribute(descendants, "img", "src");
+
+            return product;
         }
 
         private static IEnumerable<ProductDTO> FormatProducts(List<ProductDTO> products)
@@ -72,7 +75,7 @@ namespace Quisy.WebScrapers.Amazon
                 return price;
             var indexDot = price.IndexOf(".");
             var result = price.Substring(0, indexDot);
-            return result;
+            return result.Replace(",", "");
         }
 
         private static HtmlDocument GetHtmlFromAmazon(string query)

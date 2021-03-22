@@ -26,6 +26,15 @@ namespace Quisy.WebScrapers.Helpers
             return nodes.FirstOrDefault(d => d.Name.Equals(name, StringComparison.InvariantCultureIgnoreCase));
         }
 
+        public static IEnumerable<HtmlNode> GetAllByNameAndAttribute(IEnumerable<HtmlNode> nodes, string name, string attribute, string attributeValue)
+        {
+            return nodes.Where(d =>
+                                    d.Name.Equals(name, StringComparison.InvariantCultureIgnoreCase) &&
+                                    d.Attributes.Contains(attribute) &&
+                                    d.Attributes[attribute].Value.Equals
+                                                (attributeValue, StringComparison.InvariantCultureIgnoreCase));
+        }
+
         public static string GetFirstValueByNameAndAttribute(IEnumerable<HtmlNode> nodes, string name, string attribute)
         {
             var node = nodes.FirstOrDefault(d => d.Name.Equals(name, StringComparison.InvariantCultureIgnoreCase));

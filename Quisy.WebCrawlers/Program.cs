@@ -7,7 +7,7 @@ namespace Quisy.WebScrapers
         static void Main(string[] args)
         {
             Console.WriteLine("Starting Amazon...");
-            var prods = Amazon.AmazonWebScraper.GetProductsByQuery("tv 50 inch");
+            var prods = EbayWebScraper.GetProductsByQuery("tv 50 inch");
 
             foreach (var prod in prods)
             {

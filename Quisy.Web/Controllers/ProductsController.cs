@@ -1,5 +1,5 @@
 ﻿using Microsoft.AspNetCore.Mvc;
-using Quisy.WebScrapers.Amazon;
+using Quisy.WebScrapers;
 
 namespace Quisy.Api.Controllers
 {
