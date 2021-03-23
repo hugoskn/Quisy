@@ -1,5 +1,9 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Quisy.WebScrapers;
+using Quisy.WebScrapers.Models;
+using System;
+using System.Collections.Generic;
+using System.Threading.Tasks;
 
 namespace Quisy.Api.Controllers
 {
@@ -9,18 +13,37 @@ namespace Quisy.Api.Controllers
     public class ProductsController : ControllerBase
     {
         [HttpGet("{provider}")]
-        public IActionResult Get(string provider, string query)
+        public async Task<IActionResult> Get(string provider, string query)
         {
             if (string.IsNullOrWhiteSpace(provider))
                 return BadRequest();
+
+            if (provider.ToLower() == "all")
+                return Ok(await GetAllProductsFromScrapersAsync(query));
+
+            IEnumerable<ProductDTO> products;
             switch (provider.ToLower())
             {
                 case "amazon":
-                    var products = AmazonWebScraper.GetProductsByQuery(query);
+                    products = await AmazonWebScraper.GetProductsByQueryAsync(query);
+                    return Ok(products);
+                case "ebay":
+                    products = await EbayWebScraper.GetProductsByQueryAsync(query);
                     return Ok(products);
                 default:
-                    return NotFound("Provider not found");
+                    return NotFound("Products Provider not found");
             }            
-        }        
+        }
+
+        private async Task<IEnumerable<ProductDTO>> GetAllProductsFromScrapersAsync(string query)
+        {
+            var getAmazonProductsTask = AmazonWebScraper.GetProductsByQueryAsync(query);
+            var getEbayProductsTask = EbayWebScraper.GetProductsByQueryAsync(query);
+            var products = new List<ProductDTO>();
+            products.AddRange(await getAmazonProductsTask);
+            products.AddRange(await getEbayProductsTask);
+
+            return products;
+        }
     }
 }

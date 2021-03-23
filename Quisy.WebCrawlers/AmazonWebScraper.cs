@@ -4,6 +4,7 @@ using Quisy.WebScrapers.Models;
 using System.Collections.Generic;
 using System.Globalization;
 using System.IO;
+using System.Threading.Tasks;
 
 namespace Quisy.WebScrapers
 {
@@ -13,7 +14,7 @@ namespace Quisy.WebScrapers
         private static string _Delimitator = "+";
         private const int _IndexesCount = 3;
 
-        public static IEnumerable<ProductDTO> GetProductsByQuery(string query)
+        public static Task<IEnumerable<ProductDTO>> GetProductsByQueryAsync(string query)
         {
             var doc = GetHtmlFromAmazon(query);
 
@@ -28,7 +29,7 @@ namespace Quisy.WebScrapers
                     products.Add(product);
             }
                         
-            return FormatProducts(products);
+            return Task.FromResult(FormatProducts(products));
         }
 
         private static ProductDTO ExtractProductFromHtml(HtmlDocument doc, int index)
@@ -75,7 +76,7 @@ namespace Quisy.WebScrapers
                 return price;
             var indexDot = price.IndexOf(".");
             var result = price.Substring(0, indexDot);
-            return result.Replace(",", "");
+            return result.Replace(",", string.Empty).Replace("$", string.Empty).Replace(" ", string.Empty);
         }
 
         private static HtmlDocument GetHtmlFromAmazon(string query)

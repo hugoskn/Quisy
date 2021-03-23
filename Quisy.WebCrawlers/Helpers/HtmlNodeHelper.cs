@@ -31,7 +31,7 @@ namespace Quisy.WebScrapers.Helpers
             return nodes.Where(d =>
                                     d.Name.Equals(name, StringComparison.InvariantCultureIgnoreCase) &&
                                     d.Attributes.Contains(attribute) &&
-                                    d.Attributes[attribute].Value.Equals
+                                    d.Attributes[attribute].Value.Trim().Equals
                                                 (attributeValue, StringComparison.InvariantCultureIgnoreCase));
         }
 

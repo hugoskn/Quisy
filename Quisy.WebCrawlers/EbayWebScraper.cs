@@ -5,6 +5,7 @@ using System.Collections.Generic;
 using System.Globalization;
 using System.IO;
 using System.Linq;
+using System.Threading.Tasks;
 
 namespace Quisy.WebScrapers
 {
@@ -12,9 +13,9 @@ namespace Quisy.WebScrapers
     {
         private static string _BaseUrl = "https://www.ebay.com/sch/i.html?_nkw=";
         private static string _Delimitator = "+";
-        private const int _IndexesCount = 20;
+        private const int _IndexesCount = 5;
 
-        public static IEnumerable<ProductDTO> GetProductsByQuery(string query)
+        public static Task<IEnumerable<ProductDTO>> GetProductsByQueryAsync(string query)
         {
             var doc = GetHtmlFromEbay(query);
 
@@ -23,7 +24,7 @@ namespace Quisy.WebScrapers
 
             var products = ExtractProductFromHtml(doc);            
                         
-            return FormatProducts(products.ToList());
+            return Task.FromResult(FormatProducts(products.ToList()));
         }
 
         private static IEnumerable<ProductDTO> ExtractProductFromHtml(HtmlDocument doc)
@@ -36,9 +37,9 @@ namespace Quisy.WebScrapers
 
             var products = new List<ProductDTO>();
 
-            foreach (var li in lis)
+            for (int i = 0; i < _IndexesCount && i < lis.Count(); i++)
             {
-                var product = ExtractProductDetails(li.Descendants());
+                var product = ExtractProductDetails(lis.ElementAt(i).Descendants());
                 if (product != null)
                     products.Add(product);
             }
@@ -89,7 +90,7 @@ namespace Quisy.WebScrapers
             var indexDot = result.IndexOf(".");
             result = result.Substring(0, indexDot);
 
-            return result.Replace(",", "");
+            return result.Replace(",", string.Empty).Replace("$", string.Empty).Replace(" ", string.Empty);
         }
 
         private static HtmlDocument GetHtmlFromEbay(string query)
