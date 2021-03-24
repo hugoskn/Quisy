@@ -1,7 +1,8 @@
 ﻿using Microsoft.AspNetCore.Mvc;
-using Quisy.WebScrapers;
+using Quisy.WebScrapers.AmazonScrapers;
+using Quisy.WebScrapers.EbayScrapers;
 using Quisy.WebScrapers.Models;
-using System;
+using Quisy.WebScrapers.WalmartScrapers;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 
@@ -39,9 +40,11 @@ namespace Quisy.Api.Controllers
         {
             var getAmazonProductsTask = AmazonWebScraper.GetProductsByQueryAsync(query);
             var getEbayProductsTask = EbayWebScraper.GetProductsByQueryAsync(query);
+            var getWalmartProductsTask = WalmartWebScraper.GetProductsByQueryAsync(query);
             var products = new List<ProductDTO>();
             products.AddRange(await getAmazonProductsTask);
             products.AddRange(await getEbayProductsTask);
+            products.AddRange(await getWalmartProductsTask);
 
             return products;
         }

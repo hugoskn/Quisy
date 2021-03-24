@@ -7,7 +7,7 @@ using System.IO;
 using System.Threading.Tasks;
 using System.Web;
 
-namespace Quisy.WebScrapers
+namespace Quisy.WebScrapers.AmazonScrapers
 {
     public static class AmazonWebScraper
     {

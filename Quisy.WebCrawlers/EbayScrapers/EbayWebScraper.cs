@@ -3,11 +3,10 @@ using Quisy.WebScrapers.Helpers;
 using Quisy.WebScrapers.Models;
 using System.Collections.Generic;
 using System.Globalization;
-using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 
-namespace Quisy.WebScrapers
+namespace Quisy.WebScrapers.EbayScrapers
 {
     public static class EbayWebScraper
     {
@@ -104,14 +103,6 @@ namespace Quisy.WebScrapers
 
             var web = new HtmlWeb();
             var doc = web.Load(urlWithQuery);            
-            return doc;
-        }
-
-        private static HtmlDocument LoadHtmlFromLocalPath()
-        {
-            var html = File.ReadAllText(@"C:\Shared\inner.html");
-            var doc = new HtmlDocument();
-            doc.LoadHtml(html);
             return doc;
         }
     }
