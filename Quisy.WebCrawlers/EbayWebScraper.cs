@@ -65,6 +65,8 @@ namespace Quisy.WebScrapers
 
             product.Image = HtmlNodeHelper.GetFirstValueByNameAndAttribute(nodes, "img", "src");
 
+            product.Link = HtmlNodeHelper.GetFirstValueByNameAndAttribute(nodes, "a", "href");
+
             return product;
 
         }
@@ -90,7 +92,8 @@ namespace Quisy.WebScrapers
             var indexDot = result.IndexOf(".");
             result = result.Substring(0, indexDot);
 
-            return result.Replace(",", string.Empty).Replace("$", string.Empty).Replace(" ", string.Empty);
+            return result.Replace(",", string.Empty).Replace("$", string.Empty)
+                .Replace(" ", string.Empty).Replace(" ", string.Empty);//the 2nd is not a whitespace, IDK what it is
         }
 
         private static HtmlDocument GetHtmlFromEbay(string query)

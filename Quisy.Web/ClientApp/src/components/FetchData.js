@@ -5,11 +5,11 @@ export class FetchData extends Component {
 
     constructor(props) {
         super(props);
-        this.state = { products: [], loading: null, query: null };
+        this.state = { products: [], loading: null, query: 'tv 50 inch' };
     }
 
     componentDidMount() {
-        //this.populateProductsData('tv 50 inch');
+        this.populateProductsData();
     }
 
     static renderProductsTable(products) {
@@ -26,9 +26,11 @@ export class FetchData extends Component {
                 <tbody>
                     {products.map(product =>
                         <tr key={product.title}>
-                            <td>{product.title}</td>
+                            <td><a href={product.link} target='_blank'>{product.title}</a></td>
                             <td>
-                                <img src={product.image} alt={product.Title} />
+                                <a href={product.link} target='_blank'>
+                                    <img style={{ height: '50px' }} src={product.image} alt={product.Title} />
+                                </a>
                             </td>
                             <td>${product.price}</td>
                             <td>{product.source}</td>
@@ -52,7 +54,7 @@ export class FetchData extends Component {
                 <p>Please enter a product to search</p>
                 <div>
                     <input type='text' onChange={(e) => this.setState({ query: e.target.value })} />
-                    <button onClick={() => this.populateProductsData() }>Search</button>
+                    <button onClick={() => this.populateProductsData()}>Search</button>
                 </div>
                 {contents}
             </div>

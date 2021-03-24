@@ -5,14 +5,16 @@ using System.Collections.Generic;
 using System.Globalization;
 using System.IO;
 using System.Threading.Tasks;
+using System.Web;
 
 namespace Quisy.WebScrapers
 {
     public static class AmazonWebScraper
     {
-        private static string _BaseUrl = "https://www.amazon.com/s?k=";
+        private static string _BaseUrl = "https://amazon.com";
+        private static string _UrlWithParam = $"{_BaseUrl}/s?k=";
         private static string _Delimitator = "+";
-        private const int _IndexesCount = 3;
+        private const int _IndexesCount = 5;
 
         public static Task<IEnumerable<ProductDTO>> GetProductsByQueryAsync(string query)
         {
@@ -58,6 +60,8 @@ namespace Quisy.WebScrapers
 
             product.Image = HtmlNodeHelper.GetFirstValueByNameAndAttribute(descendants, "img", "src");
 
+            product.Link = HttpUtility.HtmlDecode(_BaseUrl + HtmlNodeHelper.GetFirstValueByNameAndAttribute(descendants, "a", "href"));
+
             return product;
         }
 
@@ -82,7 +86,7 @@ namespace Quisy.WebScrapers
         private static HtmlDocument GetHtmlFromAmazon(string query)
         {
             var formatedQuery = query.Replace(" ", _Delimitator);
-            var urlWithQuery = $"{_BaseUrl}{formatedQuery}";
+            var urlWithQuery = $"{_UrlWithParam}{formatedQuery}";
             CultureInfo.CurrentCulture = new CultureInfo("en-US", true);
 
             var web = new HtmlWeb();
