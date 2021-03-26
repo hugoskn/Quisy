@@ -19,7 +19,7 @@ namespace Quisy.Api.Controllers
         [HttpGet("{provider}")]
         public async Task<IActionResult> Get(string provider, string query)
         {
-            if (string.IsNullOrWhiteSpace(provider))
+            if (string.IsNullOrWhiteSpace(provider) || string.IsNullOrWhiteSpace(query))
                 return BadRequest();
 
             if (provider.ToLower() == "all")

@@ -29,7 +29,7 @@ namespace Quisy.WebScrapers.SamsScrapers
             }
             catch (Exception ex)
             {
-                QuisyDbRepository.AddLog(LogType.Exception,
+                await QuisyDbRepository.AddLogAsync(LogType.Exception,
                     $"Exception at {nameof(SamsScraper)}, method: {nameof(SamsScraper.GetProductsByQueryAsync)}. " +
                     $"Query: {query}. Message {ex.Message}");
                 return Enumerable.Empty<ProductDTO>();

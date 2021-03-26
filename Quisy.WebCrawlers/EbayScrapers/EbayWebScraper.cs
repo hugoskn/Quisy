@@ -18,30 +18,32 @@ namespace Quisy.WebScrapers.EbayScrapers
         private static string _Delimitator = "+";
         private const int _IndexesCount = 5;
 
-        public static Task<IEnumerable<ProductDTO>> GetProductsByQueryAsync(string query)
+        public static async Task<IEnumerable<ProductDTO>> GetProductsByQueryAsync(string query)
         {
             try
             {
                 var doc = GetHtmlFromEbay(query);
                 if (doc == null)
-                    return Task.FromResult(Enumerable.Empty<ProductDTO>());
+                    return Enumerable.Empty<ProductDTO>();
                 var products = ExtractProductFromHtml(doc);
-                return Task.FromResult(FormatProducts(products.ToList()));
+                return FormatProducts(products.ToList());
             }
             catch (Exception ex)
             {
-                QuisyDbRepository.AddLog(LogType.Exception,
+                await QuisyDbRepository.AddLogAsync(LogType.Exception,
                     $"Exception at {nameof(EbayWebScraper)}, method: {nameof(EbayWebScraper.GetProductsByQueryAsync)}. " +
                     $"Query: {query}. Message {ex.Message}");
-                return Task.FromResult(Enumerable.Empty<ProductDTO>());
+                return Enumerable.Empty<ProductDTO>();
             }
         }
 
         private static IEnumerable<ProductDTO> ExtractProductFromHtml(HtmlDocument doc)
         {
             var node = HtmlNodeHelper.GetFirstByNameAndClass(doc.DocumentNode.Descendants(), "ul", "srp-results srp-list clearfix");
+            var descendants = node?.Descendants();
 
-            var descendants = node.Descendants();
+            if (descendants?.Any() != true)
+                return Enumerable.Empty<ProductDTO>();
 
             var lis = HtmlNodeHelper.GetAllByNameAndAttribute(descendants, "li", "class", "s-item");
 

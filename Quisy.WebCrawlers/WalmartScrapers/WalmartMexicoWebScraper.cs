@@ -32,7 +32,7 @@ namespace Quisy.WebScrapers.WalmartScrapers
             }
             catch (Exception ex)
             {
-                QuisyDbRepository.AddLog(LogType.Exception,
+                await QuisyDbRepository.AddLogAsync(LogType.Exception,
                     $"Exception at {nameof(WalmartMexicoWebScraper)}, method: {nameof(WalmartMexicoWebScraper.GetProductsByQueryAsync)}. " +
                     $"Query: {query}. Message {ex.Message}");
                 return Enumerable.Empty<ProductDTO>();

@@ -19,17 +19,17 @@ namespace Quisy.WebScrapers.WalmartScrapers
         private static string _UrlWithQuery = $"{_BaseUrl}/search/?query=";
         private const int _IndexesCount = 5;
 
-        public static Task<IEnumerable<ProductDTO>> GetProductsByQueryAsync(string query)
+        public static async Task<IEnumerable<ProductDTO>> GetProductsByQueryAsync(string query)
         {
             if (RegionInfo.CurrentRegion.TwoLetterISORegionName == "MX")
-                return WalmartMexicoWebScraper.GetProductsByQueryAsync(query);
+                return await WalmartMexicoWebScraper.GetProductsByQueryAsync(query);
 
-            var products = ExtractProductsFromDefaultWalmart(query);
+            var products = await ExtractProductsFromDefaultWalmart(query);
 
-            return Task.FromResult(FormatProducts(products.ToList()));
+            return FormatProducts(products.ToList());
         }
 
-        private static IEnumerable<ProductDTO> ExtractProductsFromDefaultWalmart(string query)
+        private static async Task<IEnumerable<ProductDTO>> ExtractProductsFromDefaultWalmart(string query)
         {
             try
             {
@@ -41,7 +41,7 @@ namespace Quisy.WebScrapers.WalmartScrapers
             }
             catch (Exception ex)
             {
-                QuisyDbRepository.AddLog(LogType.Exception,
+                await QuisyDbRepository.AddLogAsync(LogType.Exception,
                     $"Exception at {nameof(WalmartWebScraper)}, method: {nameof(WalmartWebScraper.ExtractProductsFromDefaultWalmart)}. " +
                     $"Query: {query}. Message {ex.Message}");
                 return Enumerable.Empty<ProductDTO>();
