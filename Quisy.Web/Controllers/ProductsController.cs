@@ -1,6 +1,8 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Quisy.WebScrapers.AmazonScrapers;
+using Quisy.WebScrapers.CostcoScrapers;
 using Quisy.WebScrapers.EbayScrapers;
+using Quisy.WebScrapers.Helpers;
 using Quisy.WebScrapers.Models;
 using Quisy.WebScrapers.SamsScrapers;
 using Quisy.WebScrapers.WalmartScrapers;
@@ -21,7 +23,7 @@ namespace Quisy.Api.Controllers
                 return BadRequest();
 
             if (provider.ToLower() == "all")
-                return Ok(await GetAllProductsFromScrapersAsync(query));
+                return Ok(await ScrapersFacade.GetAllProductsFromScrapersAsync(query));
 
             IEnumerable<ProductDTO> products;
             switch (provider.ToLower())
@@ -29,27 +31,21 @@ namespace Quisy.Api.Controllers
                 case "amazon":
                     products = await AmazonWebScraper.GetProductsByQueryAsync(query);
                     return Ok(products);
+                case "costco":
+                    products = await CostcoWebScraper.GetProductsByQueryAsync(query);
+                    return Ok(products);
                 case "ebay":
                     products = await EbayWebScraper.GetProductsByQueryAsync(query);
                     return Ok(products);
+                case "sams":
+                    products = await SamsScraper.GetProductsByQueryAsync(query);
+                    return Ok(products);
+                case "walmart":
+                    products = await WalmartWebScraper.GetProductsByQueryAsync(query);
+                    return Ok(products);
                 default:
                     return NotFound("Products Provider not found");
-            }            
-        }
-
-        private async Task<IEnumerable<ProductDTO>> GetAllProductsFromScrapersAsync(string query)
-        {
-            var getAmazonProductsTask = AmazonWebScraper.GetProductsByQueryAsync(query);
-            var getEbayProductsTask = EbayWebScraper.GetProductsByQueryAsync(query);
-            var getSamsProductsTask = SamsScraper.GetProductsByQueryAsync(query);
-            var getWalmartProductsTask = WalmartWebScraper.GetProductsByQueryAsync(query);
-            var products = new List<ProductDTO>();
-            products.AddRange(await getAmazonProductsTask);
-            products.AddRange(await getEbayProductsTask);
-            products.AddRange(await getSamsProductsTask);
-            products.AddRange(await getWalmartProductsTask);
-
-            return products;
-        }
+            }
+        }        
     }
 }

@@ -10,6 +10,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\Quisy.SqlDbRepository\Quisy.SqlDbRepository.csproj" />
     <ProjectReference Include="..\Quisy.Tools\Quisy.Tools.csproj" />
   </ItemGroup>
 

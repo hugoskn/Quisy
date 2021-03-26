@@ -1,6 +1,9 @@
-﻿using Quisy.Tools.HttpHelpers;
+﻿using Quisy.SqlDbRepository;
+using Quisy.SqlDbRepository.Entities;
+using Quisy.Tools.HttpHelpers;
 using Quisy.WebScrapers.Models;
 using Quisy.WebScrapers.SamsScrapers.Models;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
@@ -15,12 +18,26 @@ namespace Quisy.WebScrapers.SamsScrapers
 
         public static async Task<IEnumerable<ProductDTO>> GetProductsByQueryAsync(string query)
         {
-            var results = await HttpClientHelper.Get<SamsSearchDto>(_UrlSearch + query);
+            try
+            {
+                var results = await HttpClientHelper.Get<SamsSearchDto>(_UrlSearch + query);
+                if (results?.Response?.Products?.Any() != true)
+                    return Enumerable.Empty<ProductDTO>();
+                var samsProducts = results?.Response?.Products;
+                var products = MapProducts(samsProducts);
+                return products;
+            }
+            catch (Exception ex)
+            {
+                QuisyDbRepository.AddLog(LogType.Exception,
+                    $"Exception at {nameof(SamsScraper)}, method: {nameof(SamsScraper.GetProductsByQueryAsync)}. " +
+                    $"Query: {query}. Message {ex.Message}");
+                return Enumerable.Empty<ProductDTO>();
+            }
+        }
 
-            if (results?.Response?.Products?.Any() != true)
-                return null;
-
-            var samsProducts = results?.Response?.Products;
+        private static List<ProductDTO> MapProducts(Products[] samsProducts)
+        {
             var products = new List<ProductDTO>();
             for (int i = 0; i < samsProducts.Length && i < _IndexesCount; i++)
             {

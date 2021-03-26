@@ -5,7 +5,7 @@ export class FetchData extends Component {
 
     constructor(props) {
         super(props);
-        this.state = { products: [], loading: null, query: 'tv 50 inch' };
+        this.state = { products: [], loading: null, loadingMessage: 'Write something to compare prices', query: 'tv 50 inch' };
     }
 
     componentDidMount() {
@@ -43,7 +43,7 @@ export class FetchData extends Component {
 
     render() {
         let contents = this.state.loading == null
-            ? <p><em>Write something to compare prices</em></p>
+            ? <p><em>{this.state.loadingMessage}</em></p>
             : this.state.loading
                 ? <p><em>Loading...</em></p>
                 : FetchData.renderProductsTable(this.state.products);
@@ -68,7 +68,14 @@ export class FetchData extends Component {
         }
         this.setState({ loading: true });
         const response = await fetch('api/products/All?query=' + this.state.query);
+        if (!response || response.status < 200 || response.status >= 300) {
+            this.setState({ loading: null, loadingMessage: 'Sorry no products found' });
+        }
         const data = await response.json();
+        if (!data) {
+            this.setState({ loading: null, loadingMessage: 'Sorry no products found' });
+        }
+
         this.setState({ products: data, loading: false });
     }
 }

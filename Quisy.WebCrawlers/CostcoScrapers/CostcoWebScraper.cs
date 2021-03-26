@@ -10,11 +10,12 @@ using System.Globalization;
 using System.Linq;
 using System.Threading.Tasks;
 
-namespace Quisy.WebScrapers.EbayScrapers
+namespace Quisy.WebScrapers.CostcoScrapers
 {
-    public static class EbayWebScraper
+    public static class CostcoWebScraper
     {
-        private static string _BaseUrl = "https://www.ebay.com/sch/i.html?_nkw=";
+        private static string _BaseUrl = "https://www.costco.com";
+        private static string _UrlWithQueryParam = $"{_BaseUrl}/CatalogSearch?dept=All&keyword=";
         private static string _Delimitator = "+";
         private const int _IndexesCount = 5;
 
@@ -31,7 +32,7 @@ namespace Quisy.WebScrapers.EbayScrapers
             catch (Exception ex)
             {
                 QuisyDbRepository.AddLog(LogType.Exception,
-                    $"Exception at {nameof(EbayWebScraper)}, method: {nameof(EbayWebScraper.GetProductsByQueryAsync)}. " +
+                    $"Exception at {nameof(CostcoWebScraper)}, method: {nameof(CostcoWebScraper.GetProductsByQueryAsync)}. " +
                     $"Query: {query}. Message {ex.Message}");
                 return Task.FromResult(Enumerable.Empty<ProductDTO>());
             }
@@ -39,17 +40,17 @@ namespace Quisy.WebScrapers.EbayScrapers
 
         private static IEnumerable<ProductDTO> ExtractProductFromHtml(HtmlDocument doc)
         {
-            var node = HtmlNodeHelper.GetFirstByNameAndClass(doc.DocumentNode.Descendants(), "ul", "srp-results srp-list clearfix");
+            var node = HtmlNodeHelper.GetFirstByNameAndClass(doc.DocumentNode.Descendants(), "div", "product-list grid");
 
             var descendants = node.Descendants();
 
-            var lis = HtmlNodeHelper.GetAllByNameAndAttribute(descendants, "li", "class", "s-item");
+            var divs = HtmlNodeHelper.GetAllByNameAndAttribute(descendants, "div", "class", "col-xs-6 col-lg-4 col-xl-3 product");
 
             var products = new List<ProductDTO>();
 
-            for (int i = 0; i < _IndexesCount && i < lis.Count(); i++)
+            for (int i = 0; i < _IndexesCount && i < divs.Count(); i++)
             {
-                var product = ExtractProductDetails(lis.ElementAt(i).Descendants());
+                var product = ExtractProductDetails(divs.ElementAt(i).Descendants());
                 if (product != null)
                     products.Add(product);
             }
@@ -59,15 +60,15 @@ namespace Quisy.WebScrapers.EbayScrapers
 
         private static ProductDTO ExtractProductDetails(IEnumerable<HtmlNode> nodes)
         {
-            var product = new ProductDTO { Source = "EBay" };
+            var product = new ProductDTO { Source = "Costco" };
 
-            var title = nodes.FirstOrDefault(n => n.Name == "h3");
+            var title = HtmlNodeHelper.GetFirstByNameAndClass(nodes, "span", "description"); ;
             if (string.IsNullOrWhiteSpace(title?.InnerText))
                 return null;
 
             product.Title = title.InnerText;
 
-            var price = HtmlNodeHelper.GetFirstByNameAndClass(nodes, "span", "s-item__price");
+            var price = HtmlNodeHelper.GetFirstByNameAndClass(nodes, "div", "price");
             if (string.IsNullOrWhiteSpace(price?.InnerText))
                 return null;
 
@@ -86,6 +87,7 @@ namespace Quisy.WebScrapers.EbayScrapers
             foreach (var product in products)
             {
                 product.Price = product.Price.FormatCurrency();
+                product.Title = product.Title.FormatHtml();
             }
             return products;
         }
@@ -93,7 +95,7 @@ namespace Quisy.WebScrapers.EbayScrapers
         private static HtmlDocument GetHtmlFromEbay(string query)
         {
             var formatedQuery = query.Replace(" ", _Delimitator);
-            var urlWithQuery = $"{_BaseUrl}{formatedQuery}";
+            var urlWithQuery = $"{_UrlWithQueryParam}{formatedQuery}";
             CultureInfo.CurrentCulture = new CultureInfo("en-US", true);
 
             var web = new HtmlWeb();

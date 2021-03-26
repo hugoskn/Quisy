@@ -1,13 +1,7 @@
-﻿using Quisy.WebScrapers.AmazonScrapers;
-using Quisy.WebScrapers.EbayScrapers;
-using Quisy.WebScrapers.Models;
-using Quisy.WebScrapers.SamsScrapers;
-using Quisy.WebScrapers.WalmartScrapers;
+﻿using Quisy.WebScrapers.Helpers;
 using System;
-using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
-using System.Threading.Tasks;
 
 namespace Quisy.WebScrapers
 {
@@ -18,7 +12,7 @@ namespace Quisy.WebScrapers
             Console.WriteLine("Getting products from scrappers...");
             var watch = new Stopwatch();
             watch.Start();
-            var prods = GetAllProductsFromScrapersAsync("tv 50 inch").Result;
+            var prods = ScrapersFacade.GetAllProductsFromScrapersAsync("tv 50 inch").Result;
             watch.Stop();
             Console.WriteLine($"Retrieved {prods.Count()} from scrappers in {watch.ElapsedMilliseconds / 1000} seconds \n");
 
@@ -36,21 +30,6 @@ namespace Quisy.WebScrapers
                 Console.WriteLine();
             }
             
-        }
-
-        private static async Task<IEnumerable<ProductDTO>> GetAllProductsFromScrapersAsync(string query)
-        {
-            var getAmazonProductsTask = AmazonWebScraper.GetProductsByQueryAsync(query);
-            var getEbayProductsTask = EbayWebScraper.GetProductsByQueryAsync(query);
-            var getSamsProductsTask = SamsScraper.GetProductsByQueryAsync(query);
-            var getWalmartProductsTask = WalmartWebScraper.GetProductsByQueryAsync(query);
-            var products = new List<ProductDTO>();
-            products.AddRange(await getAmazonProductsTask);
-            products.AddRange(await getEbayProductsTask);
-            products.AddRange(await getSamsProductsTask);
-            products.AddRange(await getWalmartProductsTask);
-
-            return products;
-        }
+        }        
     }
 }

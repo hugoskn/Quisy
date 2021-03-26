@@ -1,9 +1,14 @@
 ﻿using HtmlAgilityPack;
+using Quisy.SqlDbRepository;
+using Quisy.SqlDbRepository.Entities;
+using Quisy.Tools.Extensions;
 using Quisy.WebScrapers.Helpers;
 using Quisy.WebScrapers.Models;
+using System;
 using System.Collections.Generic;
 using System.Globalization;
 using System.IO;
+using System.Linq;
 using System.Threading.Tasks;
 using System.Web;
 
@@ -18,20 +23,34 @@ namespace Quisy.WebScrapers.AmazonScrapers
 
         public static Task<IEnumerable<ProductDTO>> GetProductsByQueryAsync(string query)
         {
-            var doc = GetHtmlFromAmazon(query);
+            try
+            {
+                var doc = GetHtmlFromAmazon(query);
+                if (doc == null)
+                    return Task.FromResult(Enumerable.Empty<ProductDTO>());
+                var products = GetProductsDetails(doc);
+                return Task.FromResult(FormatProducts(products));
+            }
+            catch (Exception ex)
+            {
+                QuisyDbRepository.AddLog(LogType.Exception, 
+                    $"Exception at {nameof(AmazonWebScraper)}, method: {nameof(AmazonWebScraper.GetProductsByQueryAsync)}. " +
+                    $"Query: {query}. Message {ex.Message}");
+                return Task.FromResult(Enumerable.Empty<ProductDTO>());
+            }            
+        }
 
-            if (doc == null)            
-                return null;
-
+        private static List<ProductDTO> GetProductsDetails(HtmlDocument doc)
+        {
             var products = new List<ProductDTO>();
             for (int i = 0; i <= _IndexesCount; i++)
             {
                 var product = ExtractProductFromHtml(doc, i);
-                if(product != null)
+                if (product != null)
                     products.Add(product);
             }
-                        
-            return Task.FromResult(FormatProducts(products));
+
+            return products;
         }
 
         private static ProductDTO ExtractProductFromHtml(HtmlDocument doc, int index)
@@ -69,18 +88,9 @@ namespace Quisy.WebScrapers.AmazonScrapers
         {
             foreach (var product in products)
             {
-                product.Price = FormatPrice(product.Price);
+                product.Price = product.Price.FormatCurrency();
             }
             return products;
-        }
-
-        private static string FormatPrice(string price)
-        {
-            if (string.IsNullOrWhiteSpace(price) || !price.Contains("."))
-                return price;
-            var indexDot = price.IndexOf(".");
-            var result = price.Substring(0, indexDot);
-            return result.Replace(",", string.Empty).Replace("$", string.Empty).Replace(" ", string.Empty);
         }
 
         private static HtmlDocument GetHtmlFromAmazon(string query)

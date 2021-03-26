@@ -1,13 +1,15 @@
 ﻿using HtmlAgilityPack;
+using Quisy.SqlDbRepository;
+using Quisy.SqlDbRepository.Entities;
+using Quisy.Tools.Extensions;
 using Quisy.WebScrapers.Helpers;
 using Quisy.WebScrapers.Models;
+using System;
 using System.Collections.Generic;
 using System.Globalization;
 using System.IO;
 using System.Linq;
-using System.Text.RegularExpressions;
 using System.Threading.Tasks;
-using System.Web;
 
 namespace Quisy.WebScrapers.WalmartScrapers
 {
@@ -21,19 +23,33 @@ namespace Quisy.WebScrapers.WalmartScrapers
         {
             if (RegionInfo.CurrentRegion.TwoLetterISORegionName == "MX")
                 return WalmartMexicoWebScraper.GetProductsByQueryAsync(query);
-                        
+
             var products = ExtractProductsFromDefaultWalmart(query);
-                        
+
             return Task.FromResult(FormatProducts(products.ToList()));
         }
 
         private static IEnumerable<ProductDTO> ExtractProductsFromDefaultWalmart(string query)
         {
-            var doc = GetHtmlFromWalmart(_UrlWithQuery, query);
+            try
+            {
+                var doc = GetHtmlFromWalmart(_UrlWithQuery, query);
 
-            if (doc == null)
-                return null;
+                if (doc == null)
+                    return Enumerable.Empty<ProductDTO>();
+                return MapProducts(doc);
+            }
+            catch (Exception ex)
+            {
+                QuisyDbRepository.AddLog(LogType.Exception,
+                    $"Exception at {nameof(WalmartWebScraper)}, method: {nameof(WalmartWebScraper.ExtractProductsFromDefaultWalmart)}. " +
+                    $"Query: {query}. Message {ex.Message}");
+                return Enumerable.Empty<ProductDTO>();
+            }
+        }
 
+        private static IEnumerable<ProductDTO> MapProducts(HtmlDocument doc)
+        {
             var products = new List<ProductDTO>();
 
             for (int i = 0; i < _IndexesCount; i++)
@@ -57,7 +73,7 @@ namespace Quisy.WebScrapers.WalmartScrapers
                 return null;
 
             product.Title = title.InnerText;
-            
+
             var price = HtmlNodeHelper.GetFirstByNameAndClass(nodes, "span", "price-characteristic");
             if (string.IsNullOrWhiteSpace(price?.InnerText))
                 return null;
@@ -76,28 +92,14 @@ namespace Quisy.WebScrapers.WalmartScrapers
         {
             foreach (var product in products)
             {
-                product.Title = FormatTitle(product.Title);
+                product.Title = product.Title.FormatHtml();
             }
             return products;
         }
 
-        private static string FormatTitle(string value)
-        {
-            if (string.IsNullOrWhiteSpace(value))
-                return value;
-            while (value.Contains("  "))
-                value = value.Replace("  ", " ");
-
-            value = HttpUtility.HtmlDecode(value);
-            value = Regex.Replace(value, "<[^>]*>", string.Empty);
-            value = Regex.Replace(value, @"\t|\n|\r", "");
-
-            return value;
-        }
-
         private static HtmlDocument GetHtmlFromWalmart(string url, string query)
-        {            
-            return new HtmlWeb().Load($"{url}{query}");            
+        {
+            return new HtmlWeb().Load($"{url}{query}");
         }
 
         private static HtmlDocument LoadHtmlFromLocalPath()
