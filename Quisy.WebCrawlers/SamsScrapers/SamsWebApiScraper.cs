@@ -10,7 +10,7 @@ using System.Threading.Tasks;
 
 namespace Quisy.WebScrapers.SamsScrapers
 {
-    public class SamsScraper
+    public class SamsWebApiScraper
     {
         private static string _BaseUrl = "https://www.samsclub.com";
         private static string _UrlSearch = $"{_BaseUrl}/api/node/vivaldi/v1/search-suggestions?num=8&pnum={_IndexesCount}&v=1&cnum=0&term=";
@@ -30,7 +30,7 @@ namespace Quisy.WebScrapers.SamsScrapers
             catch (Exception ex)
             {
                 await QuisyDbRepository.AddLogAsync(LogType.Exception,
-                    $"Exception at {nameof(SamsScraper)}, method: {nameof(SamsScraper.GetProductsByQueryAsync)}. " +
+                    $"Exception at {nameof(SamsWebApiScraper)}, method: {nameof(SamsWebApiScraper.GetProductsByQueryAsync)}. " +
                     $"Query: {query}. Message {ex.Message}");
                 return Enumerable.Empty<ProductDTO>();
             }
