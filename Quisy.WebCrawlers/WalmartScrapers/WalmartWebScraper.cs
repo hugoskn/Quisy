@@ -33,10 +33,13 @@ namespace Quisy.WebScrapers.WalmartScrapers
         {
             try
             {
+                //var doc = LoadHtmlFromLocalPath();
                 var doc = GetHtmlFromWalmart(_UrlWithQuery, query);
-
-                if (doc == null)
+                if (string.IsNullOrWhiteSpace(doc?.DocumentNode?.InnerHtml))
+                {
+                    QuisyDbRepository.AddLogAsync(LogType.Error, "No data from Walmart US: " + _UrlWithQuery + query);
                     return Enumerable.Empty<ProductDTO>();
+                }
                 return MapProducts(doc);
             }
             catch (Exception ex)
@@ -56,6 +59,8 @@ namespace Quisy.WebScrapers.WalmartScrapers
             {
                 var li = HtmlNodeHelper.GetFirstByNameAndAttribute(
                     doc.DocumentNode.Descendants(), "li", "data-tl-id", $"ProductTileGridView-{i}");
+                if (li == null)
+                    continue;
                 var product = ExtractProductDetails(li.Descendants());
                 if (product != null)
                     products.Add(product);
@@ -104,7 +109,7 @@ namespace Quisy.WebScrapers.WalmartScrapers
 
         private static HtmlDocument LoadHtmlFromLocalPath()
         {
-            var html = File.ReadAllText(@"C:\Shared\walmart us.html");
+            var html = File.ReadAllText(@"C:\Shared\walmartUs.html");
             var doc = new HtmlDocument();
             doc.LoadHtml(html);
             return doc;
