@@ -1,10 +1,16 @@
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
-using Microsoft.AspNetCore.HttpsPolicy;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.SpaServices.ReactDevelopmentServer;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using Microsoft.IdentityModel.Tokens;
+using Quisy.Authorization.DbContexts;
+using Quisy.Authorization.Models;
+using System.Text;
 
 namespace Quisy.Web
 {
@@ -20,6 +26,14 @@ namespace Quisy.Web
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
+            services.AddDbContext<ApplicationDbContext>(options =>
+               options.UseSqlServer(Configuration.GetConnectionString("DefaultConnection")));
+
+            AddIdentity(services);
+
+            AddJwtAuth(services);
+
+            services.AddMemoryCache();
 
             services.AddControllersWithViews();
 
@@ -66,6 +80,45 @@ namespace Quisy.Web
                     spa.UseReactDevelopmentServer(npmScript: "start");
                 }
             });
+        }
+
+        private static void AddIdentity(IServiceCollection services)
+        {
+            services.AddIdentity<ApplicationUser, IdentityRole>(options =>
+            {
+                options.SignIn.RequireConfirmedAccount = false;
+                options.Password.RequireUppercase = false;
+                options.Password.RequireLowercase = false;
+                options.Password.RequireNonAlphanumeric = false;
+                options.Password.RequireDigit = false;
+            })
+                            .AddEntityFrameworkStores<ApplicationDbContext>()
+                            .AddDefaultTokenProviders();
+        }
+
+        private void AddJwtAuth(IServiceCollection services)
+        {
+            services.AddAuthentication(options =>
+            {
+                options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+                options.DefaultScheme = JwtBearerDefaults.AuthenticationScheme;
+                options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+
+            })
+                .AddJwtBearer(options =>
+                {
+                    options.TokenValidationParameters = new TokenValidationParameters
+                    {
+                        ValidateIssuer = false,
+                        ValidateAudience = false,
+                        ValidateLifetime = false,
+                        ValidateIssuerSigningKey = false,
+
+                        ValidIssuer = "https://www.quisy.com",
+                        ValidAudience = "https://www.quisy.com",
+                        IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes("superSecretKey@345"))
+                    };
+                });
         }
     }
 }
