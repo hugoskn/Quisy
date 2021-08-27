@@ -15,6 +15,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Quisy.Tools.Tests", "Quisy.
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Quisy.SqlDbRepository", "Quisy.SqlDbRepository\Quisy.SqlDbRepository.csproj", "{BB2362B2-9D52-46AF-BA5F-696D63CB48FC}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Quisy.Web", "Quisy.Web\Quisy.Web.csproj", "{1BEF4CB5-E18F-429F-823B-09E9C8E7F17C}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -41,6 +43,10 @@ Global
 		{BB2362B2-9D52-46AF-BA5F-696D63CB48FC}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{BB2362B2-9D52-46AF-BA5F-696D63CB48FC}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{BB2362B2-9D52-46AF-BA5F-696D63CB48FC}.Release|Any CPU.Build.0 = Release|Any CPU
+		{1BEF4CB5-E18F-429F-823B-09E9C8E7F17C}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{1BEF4CB5-E18F-429F-823B-09E9C8E7F17C}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{1BEF4CB5-E18F-429F-823B-09E9C8E7F17C}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{1BEF4CB5-E18F-429F-823B-09E9C8E7F17C}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
