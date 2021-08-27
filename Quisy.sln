@@ -3,8 +3,6 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 16
 VisualStudioVersion = 16.0.31025.194
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Quisy.Web", "Quisy.Web\Quisy.Web.csproj", "{E46822C1-AA57-42B8-ABA4-6CB9257E121B}"
-EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Quisy.Authorization", "Quisy.Authorization\Quisy.Authorization.csproj", "{25F5F5D1-8FE2-4AF4-B2B2-4F43221781EE}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Quisy.Tools", "Quisy.Tools\Quisy.Tools.csproj", "{FCBA088B-6E93-41D5-A225-70B27BBE21E2}"
@@ -13,9 +11,9 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Quisy.WebScrapers", "Quisy.
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Tests", "Tests", "{3AE262F4-6964-410E-9970-CD62ACC40325}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Quisy.Tools.Tests", "Quisy.Tools.Tests\Quisy.Tools.Tests.csproj", "{781AA34E-A47E-452F-821D-06EA2FB14C99}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Quisy.Tools.Tests", "Quisy.Tools.Tests\Quisy.Tools.Tests.csproj", "{781AA34E-A47E-452F-821D-06EA2FB14C99}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Quisy.SqlDbRepository", "Quisy.SqlDbRepository\Quisy.SqlDbRepository.csproj", "{BB2362B2-9D52-46AF-BA5F-696D63CB48FC}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Quisy.SqlDbRepository", "Quisy.SqlDbRepository\Quisy.SqlDbRepository.csproj", "{BB2362B2-9D52-46AF-BA5F-696D63CB48FC}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -23,10 +21,6 @@ Global
 		Release|Any CPU = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
-		{E46822C1-AA57-42B8-ABA4-6CB9257E121B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{E46822C1-AA57-42B8-ABA4-6CB9257E121B}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{E46822C1-AA57-42B8-ABA4-6CB9257E121B}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{E46822C1-AA57-42B8-ABA4-6CB9257E121B}.Release|Any CPU.Build.0 = Release|Any CPU
 		{25F5F5D1-8FE2-4AF4-B2B2-4F43221781EE}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{25F5F5D1-8FE2-4AF4-B2B2-4F43221781EE}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{25F5F5D1-8FE2-4AF4-B2B2-4F43221781EE}.Release|Any CPU.ActiveCfg = Release|Any CPU
